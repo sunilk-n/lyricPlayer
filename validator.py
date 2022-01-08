@@ -37,7 +37,6 @@ def validatorDecrypt(secretKey):
 
 def validate(secretKey):
     timeStamp = validatorDecrypt(secretKey)
-    print(timeStamp)
     if not timeStamp:
         return False
     currentTime = datetime.datetime.now()
@@ -48,6 +47,6 @@ def validate(secretKey):
         return True
 
 
-if __name__ == '__main__':
-    print(validatorEncrypt(1641570000))
-    # print(validate("license.key"))
+# if __name__ == '__main__':
+#     # print(validatorEncrypt(1641670000))
+#     print(validate("license.key"))
