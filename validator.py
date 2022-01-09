@@ -35,18 +35,22 @@ def validatorDecrypt(secretKey):
     return message
 
 
-def validate(secretKey):
-    timeStamp = validatorDecrypt(secretKey)
+def validate(secretKey, timeStamp=None):
+    timeStamp = timeStamp or validatorDecrypt(secretKey)
     if not timeStamp:
         return False
     currentTime = datetime.datetime.now()
-    print(currentTime.timestamp())
-    if timeStamp < currentTime.timestamp():
+    if float(timeStamp) < currentTime.timestamp():
         return False
     else:
         return True
 
 
-# if __name__ == '__main__':
-#     # print(validatorEncrypt(1641670000))
-#     print(validate("license.key"))
+def validDate(timeStamp=None):
+    dateObject = datetime.datetime.fromtimestamp(float(timeStamp))
+    return dateObject.strftime("%d-%m-%Y")
+
+
+if __name__ == '__main__':
+    print(validatorEncrypt(1642900000))
+#     # print(validate("license.key"))
