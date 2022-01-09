@@ -1,6 +1,4 @@
 import os
-import vlc
-import time
 from cryptography.fernet import Fernet
 
 KEY = Fernet.generate_key()
@@ -41,6 +39,8 @@ def decryptFile(filePath, destPath=None, key=None):
     # writing the decrypted data
     if destPath:
         filePath = os.path.join(destPath, os.path.basename(filePath))
+        if os.path.isfile(destPath):
+            filePath = destPath
     with open(filePath, 'wb') as dec_file:
         dec_file.write(decrypted)
     return filePath
@@ -48,6 +48,8 @@ def decryptFile(filePath, destPath=None, key=None):
 
 if __name__ == '__main__':
     # print(KEY)
-    # encryptFile(r"D:\2-Dev-Vatapiganapathi bhaje1.mp4")
+    # encryptFile(r"D:\testing\1.Dev-Vakrathunda mahakaya.mp4", destPath=r"H:\githubProjects\lyricPlayer\songs")
+    # encryptFile(r"D:\testing\2-Dev-Vatapiganapathi bhaje.mp4", destPath=r"H:\githubProjects\lyricPlayer\songs")
+    # encryptFile(r"D:\testing\3.Gananayakaya .m4v", destPath=r"H:\githubProjects\lyricPlayer\songs")
     path = decryptFile(r"D:\2-Dev-Vatapiganapathi bhaje1.mp4", destPath=r"D:\testing")
 

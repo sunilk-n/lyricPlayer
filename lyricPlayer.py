@@ -1,40 +1,58 @@
 import sys
 import os
-from PySide2 import QtWidgets
+import re
+import tempfile
+from functools import partial
+from PySide2 import QtWidgets, QtGui
 from PySide2.QtCore import QSettings
 
 import validator
 from ui import widgets
+import fileEncryptor
+from player import Player
 
 
 class LyricPlayer(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super(LyricPlayer, self).__init__(parent)
         self.settings = QSettings("SRS", "lyricPlayer")
+        self.lyricsPath = r"H:\githubProjects\lyricPlayer\songs"
         if not self.validateLicense():
-            self.installLicense(isValid=False)
+            self.installLicense(False)
             if not self.validateLicense():
                 sys.exit()
 
         self.setWindowTitle("Lyric Player(valid till %s)" % (validator.validDate(self.settings.value("licenseKey"))))
+        self.setMinimumHeight(300)
+        self.setMinimumWidth(500)
+
+        self.lyricsWidget = widgets.loadWidget("lyricalPlayer", self)
+        self.lyricsWidget.lyricsModel = QtGui.QStandardItemModel()
+        self.lyricsWidget.playList.setModel(self.lyricsWidget.lyricsModel)
+        self.lyricsWidget.playList.doubleClicked.connect(self.playSong)
 
         self.createMenuBar()
+        self.updateLyricList()
 
     def createMenuBar(self):
         menubar = self.menuBar()
         fileMenu = menubar.addMenu("&File")
+        # editMenu = menubar.addMenu("&Edit")
         helpMenu = menubar.addMenu("&Help")
 
-        importAction = QtWidgets.QAction("&Import", self)
-        importAction.triggered.connect(self.close)
+        # importAction = QtWidgets.QAction("&Import", self)
+        # importAction.triggered.connect(self.close)
         exitAction = QtWidgets.QAction("&Exit", self)
         exitAction.triggered.connect(self.close)
-        fileMenu.addAction(importAction)
+        # fileMenu.addAction(importAction)
         fileMenu.addSeparator()
         fileMenu.addAction(exitAction)
 
+        # srcPathAction = QtWidgets.QAction("&Source Path", self)
+        # editMenu.addAction(srcPathAction)
+
         licenseAction = QtWidgets.QAction("&License", self)
-        licenseAction.triggered.connect(self.installLicense)
+        licenseAction.triggered.connect(partial(self.installLicense, True))
         aboutAction = QtWidgets.QAction("&About", self)
         helpMenu.addAction(licenseAction)
         helpMenu.addSeparator()
@@ -66,7 +84,6 @@ class LyricPlayer(QtWidgets.QMainWindow):
         return True
 
     def installLicense(self, isValid=True):
-        print(isValid)
         self.licenseDialog = widgets.loadDialog("licenseValidator", self)
         if not isValid:
             self.licenseDialog.setWindowTitle("License Expired!")
@@ -86,7 +103,9 @@ class LyricPlayer(QtWidgets.QMainWindow):
             self.licenseDialog.validateBtn.clicked.connect(self.validateLicenseKey)
             self.licenseDialog.exec_()
         else:
-            self.licenseDialog.setWindowTitle("License ends on %s!" % self.settings.value("licenseKey"))
+            self.licenseDialog.setWindowTitle("License ends on %s!" % validator.validDate(
+                            self.settings.value("licenseKey")
+                        ))
             self.licenseDialog.displayMsg.setText(
                 "<b>Your license will get expired on %s, "
                 "If you wish to update the license please select a license file.</b>" % (
@@ -135,6 +154,21 @@ class LyricPlayer(QtWidgets.QMainWindow):
                 "Invalid Path!", "Please select a valid license file path",
                 self.licenseDialog
             )
+
+    def updateLyricList(self, filter=None):
+        self.lyricsWidget.lyricsModel.clear()
+        searchPattern = ""
+        availableList = [song for song in os.listdir(self.lyricsPath)]
+        for song in availableList:
+            item = QtGui.QStandardItem(song)
+            self.lyricsWidget.lyricsModel.appendRow(item)
+
+    def playSong(self, item):
+        temp = tempfile.TemporaryDirectory()
+        songPath = os.path.join(self.lyricsPath, item.data())
+        tempSongPath = fileEncryptor.decryptFile(songPath, destPath=temp.name)
+        playing = Player(master=self, songPath=tempSongPath)
+        playing.show()
 
 
 if __name__ == '__main__':

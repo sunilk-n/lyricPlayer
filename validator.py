@@ -52,5 +52,5 @@ def validDate(timeStamp=None):
 
 
 if __name__ == '__main__':
-    print(validatorEncrypt(1642900000))
+    print(validatorEncrypt(1642700000))
 #     # print(validate("license.key"))

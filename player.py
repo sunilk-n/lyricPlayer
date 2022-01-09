@@ -46,6 +46,7 @@ class Player(QtWidgets.QMainWindow):
         self.isPaused = False
         if songPath:
             self.OpenFile([songPath])
+        self.setWindowState(QtCore.Qt.WindowMaximized)
 
     def createUI(self):
         """Set up the user interface, signals & slots
@@ -197,6 +198,9 @@ class Player(QtWidgets.QMainWindow):
                 # "Pause", not the desired behavior of a media player
                 # this will fix it
                 self.Stop()
+
+    def closeEvent(self, event):
+        self.mediaplayer.stop()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
