@@ -1,6 +1,8 @@
 import os
 from cryptography.fernet import Fernet
 
+import settings as _settings
+
 KEY = Fernet.generate_key()
 
 def encryptFile(filePath, destPath=None, key=None):
@@ -21,6 +23,7 @@ def encryptFile(filePath, destPath=None, key=None):
 
 def decryptFile(filePath, destPath=None, key=None):
     # using the key
+    _settings.LOG.debug("Decrypting the song file")
     if not key:
         key = KEY
     fernet = Fernet(key)
@@ -43,6 +46,7 @@ def decryptFile(filePath, destPath=None, key=None):
             filePath = destPath
     with open(filePath, 'wb') as dec_file:
         dec_file.write(decrypted)
+    _settings.LOG.debug("Song file %s decrypted" % os.path.basename(filePath))
     return filePath
 
 

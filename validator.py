@@ -46,11 +46,25 @@ def validate(secretKey, timeStamp=None):
         return True
 
 
+def warnLicense(timestamp):
+    getToday = datetime.datetime.now()
+    licenseDate = datetime.datetime.fromtimestamp(float(timestamp))
+    if (licenseDate-getToday).days < 3 and not (licenseDate-getToday).days < 0:
+        return True
+    else:
+        return False
+
+
+def generateKeyFile(date, month, year):
+    pass
+
+
 def validDate(timeStamp=None):
     dateObject = datetime.datetime.fromtimestamp(float(timeStamp))
     return dateObject.strftime("%d-%m-%Y")
 
 
 if __name__ == '__main__':
-    print(validatorEncrypt(1642700000))
-#     # print(validate("license.key"))
+    print(validatorEncrypt(1643000000))
+    # print(validate("license.key"))
+    # warnLicense(1642700000)

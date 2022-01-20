@@ -24,6 +24,8 @@ import os.path
 import vlc
 from PySide2 import QtWidgets, QtCore, QtGui
 
+import settings as _settings
+
 try:
     unicode        # Python 2
 except NameError:
@@ -35,6 +37,7 @@ class Player(QtWidgets.QMainWindow):
     """
     def __init__(self, master=None, songPath=None):
         QtWidgets.QMainWindow.__init__(self, master)
+        _settings.LOG.debug("Initialized lyric player")
         self.setWindowTitle("Media Player")
 
         # creating a basic vlc instance
@@ -143,7 +146,7 @@ class Player(QtWidgets.QMainWindow):
         """
         if filename is None:
             filename = QtWidgets.QFileDialog.getOpenFileName(self, "Open File", os.path.expanduser('~'))
-        print(filename)
+        # print(filename)
 
         # create the media
         if sys.version < '3':
